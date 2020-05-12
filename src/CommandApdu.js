@@ -26,8 +26,18 @@ class CommandApdu {
             let p1 = obj.p1;
             let p2 = obj.p2;
             let data = obj.data;
-            let le = obj.le || 0;
+            let le = obj.le; // maybe allowing for this to be undefined is easier to understand 
             let lc;
+
+            // transform data from Buffer to js Array (why?), allow for string (necessary? where?)
+            if (obj.data) {
+                if (Buffer.isBuffer(obj.data)) data = [...obj.data];
+                else if (typeof obj.data === 'string') {
+                    obj.data = obj.data.length % 2 !== 0 ? '0' + obj.data : obj.data;
+                    const buf = new Buffer(obj.data, 'hex');
+                    data = [...buf];
+                }
+            }
 
             // case 1
             if (!size && !data && !le) {
@@ -58,7 +68,8 @@ class CommandApdu {
             if (data) {
                 lc = data.length;
             } else {
-                //lc = 0;
+                // uncommented next line (length content byte should be 0 if data present)
+                lc = 0;
             }
 
             this.bytes = [];
@@ -71,7 +82,13 @@ class CommandApdu {
                 this.bytes.push(lc);
                 this.bytes = this.bytes.concat(data);
             }
-            this.bytes.push(le);
+
+            // added important logic: le byte should not be present in every apdu
+            if (le) {
+                this.bytes.push(le);
+            } else if (!data) {
+                this.bytes.push(lc);
+            }
         }
     }
 
