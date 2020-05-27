@@ -66,6 +66,22 @@ class Card extends EventEmitter {
             });
         }
     };
+
+    reset(action, callback) {
+        if (callback) {
+            this.device.reset(action, (err, response) => {
+                callback(err, response);
+            });
+        } else {
+            return new Promise((resolve, reject) => {
+                this.device.reset(action, (err, response) => {
+                    if (err) return reject(err);
+                    resolve(this);
+                });
+            })
+        }
+
+    }
 }
 
 export default Card;

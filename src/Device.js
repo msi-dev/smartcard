@@ -66,6 +66,10 @@ class Device extends EventEmitter {
     toString() {
         return `${this.getName()}`;
     }
+
+    reset(action, cb) {
+        return this.reader.reconnect({ initialization: action }, cb);
+    }
 }
 
 export default Device;

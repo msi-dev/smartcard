@@ -1,6 +1,6 @@
 {
-  "name": "smartcard",
-  "version": "1.0.32",
+  "name": "@msi.js/smartcard",
+  "version": "1.0.35-dev.5",
   "author": "tomkp <tom@tomkp.com>",
   "keywords": [
     "pcsc",
@@ -14,7 +14,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tomkp/smartcard.git"
+    "url": "https://github.com/msi-dev/smartcard"
   },
   "bugs": {
     "url": "https://github.com/tomkp/smartcard/issues"
@@ -27,8 +27,8 @@
     "release:patch": "npm run compile && npm version patch && git push && npm publish"
   },
   "dependencies": {
-    "hexify": "^1.0.1",
-    "pcsclite": "^1.0.0"
+    "@msi.js/pcsclite": "^1.0.0-dev.2",
+    "hexify": "^1.0.1"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

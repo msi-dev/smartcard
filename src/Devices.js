@@ -1,6 +1,6 @@
 'use strict';
 
-const pcsclite = require('pcsclite');
+const pcsclite = require('@msi.js/pcsclite');
 import {EventEmitter} from 'events';
 import Device from './Device';
 
