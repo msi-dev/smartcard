@@ -26,7 +26,9 @@ class Device extends EventEmitter {
                     this.emit('error', err);
                 } else {
                     this.card = new Card(this, status.atr, protocol);
-                    this.emit('card-inserted', {device: this, card: this.card});
+                    setTimeout(() => {
+                        this.emit('card-inserted', {device: this, card: this.card});
+                    }, 300);
                 }
             });
         };
