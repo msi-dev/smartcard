@@ -41,6 +41,9 @@ class Iso7816Application extends EventEmitter {
             .issueCommand(commandApdu)
             .then(resp => {
                 var response = new ResponseApdu(resp);
+                console.log(`Iso7816Application -> issueCommand -> response`, response)
+                console.log(`Iso7816Application -> issueCommand -> response.hasMoreBytesAvailable()`, response.hasMoreBytesAvailable())
+                console.log(`Iso7816Application -> issueCommand -> response.isWrongLength()`, response.isWrongLength())
                 //console.log(`status code '${response.statusCode()}'`);
                 if (response.hasMoreBytesAvailable()) {
                     //console.log(`has '${response.data.length}' more bytes available`);

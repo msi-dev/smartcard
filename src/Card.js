@@ -55,11 +55,13 @@ class Card extends EventEmitter {
                 this.device.transmit(buffer, 0x102, protocol, (err, response) => {
                     if (err) reject(err);
                     else {
+                        console.log('to emit')
                         this.emit('response-received', {
                             card: this,
                             command: commandApdu,
                             response: new ResponseApdu(response)
                         });
+                        console.log('emitted');
                         resolve(response);
                     }
                 });
