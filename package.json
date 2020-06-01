@@ -1,6 +1,6 @@
 {
   "name": "@msi.js/smartcard",
-  "version": "1.0.36",
+  "version": "1.0.38",
   "author": "tomkp <tom@tomkp.com>",
   "keywords": [
     "pcsc",
@@ -22,7 +22,7 @@
   "homepage": "https://github.com/tomkp/smartcard",
   "main": "lib/index.js",
   "scripts": {
-    "compile": "babel -d lib/ src/",
+    "compile": "npx babel -d lib/ src/",
     "compile:watch": "babel -w -d lib/ src/",
     "release:patch": "npm run compile && npm version patch && git push && npm publish"
   },
