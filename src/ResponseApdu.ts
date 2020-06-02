@@ -1,5 +1,3 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
 const statusCodes = {
     '^9000$': 'Normal processing',
     '^61(.{2})$': 'Normal processing, (sw2 indicates the number of response bytes still available)',
@@ -15,9 +13,9 @@ const statusCodes = {
     '^6300$': 'no info',
     '^6381$': 'last write filled up file',
     '^6382$': 'execution successful after retry',
-    //          c0	least significant nibble is a counter....
-    //          ..	..valued from 0 to 15
-    //          cf
+//          c0	least significant nibble is a counter....
+//          ..	..valued from 0 to 15
+//          cf
     '^64(.{2})$': 'Execution error',
     '^65(.{2})$': 'Execution error',
     '^6500$': 'no info',
@@ -36,11 +34,15 @@ const statusCodes = {
     '^6e(.{2})$': 'Checking error: class not supported',
     '^6f(.{2})$': 'Checking error: no precise diagnosis'
 };
-class ResponseApdu {
+
+
+export class ResponseApdu {
+    public data: string;
     constructor(buffer) {
         this.buffer = buffer;
         this.data = buffer.toString('hex');
     }
+
     meaning() {
         const statusCode = this.getStatusCode();
         for (let prop in statusCodes) {
@@ -54,35 +56,41 @@ class ResponseApdu {
         return 'Unknown';
     }
     getDataOnly() {
-        return this.data.substr(0, this.data.length - 4);
+      return this.data.substr(0, this.data.length-4);
     }
     getStatusCode() {
         return this.data.substr(-4);
     }
+
     isOk() {
         return this.getStatusCode() === '9000';
     }
+
     buffer() {
         return this.buffer;
     }
+
     hasMoreBytesAvailable() {
         return this.data.substr(-4, 2) === '61';
     }
+
     numberOfBytesAvailable() {
         let hexLength = this.data.substr(-2, 2);
         return parseInt(hexLength, 16);
     }
+
     isWrongLength() {
         return this.data.substr(-4, 2) === '6c';
     }
+
     correctLength() {
         let hexLength = this.data.substr(-2, 2);
         return parseInt(hexLength, 16);
     }
+
     toString() {
         return this.data;
     }
 }
-exports.ResponseApdu = ResponseApdu;
-exports.default = ResponseApdu;
-//# sourceMappingURL=ResponseApdu.js.map
+
+export default ResponseApdu;
