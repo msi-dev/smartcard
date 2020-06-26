@@ -89,7 +89,7 @@ export class CommandApdu {
     }
 
     toString() {
-        return Buffer.isBuffer(this.bytes) ? this.bytes.toString('hex') : this.bytes;
+        return Buffer.isBuffer(this.bytes) ? this.bytes.toString('hex') : this.toHexString(this.bytes);
     }
 
     toByteArray() {
@@ -103,6 +103,15 @@ export class CommandApdu {
     setLe(le) {
         this.bytes.pop();
         this.bytes.push(le);
+    }
+
+    private toHexString(byteArray: number[]) {
+        let str = '';
+        byteArray.forEach(b => {
+            const hex = b.toString(16);
+            str += hex.length < 2 ? '0' + hex : hex;
+        });
+        return str;
     }
 }
 

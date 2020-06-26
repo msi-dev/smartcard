@@ -28,9 +28,12 @@ export class Device extends EventEmitter {
                     this.emit('error', err);
                 } else {
                     this.card = new Card(this, status.atr, protocol);
+                    let start = Date.now();
                     setTimeout(() => {
+                        const milli = Date.now() - start;
+                        console.log('[on smartcard lib] card-inserted delay:', milli);
                         this.emit('card-inserted', {device: this, card: this.card});
-                    }, 300);
+                    }, 1000);
                 }
             });
         };

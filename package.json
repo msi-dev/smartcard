@@ -1,6 +1,6 @@
 {
   "name": "@msi.js/smartcard",
-  "version": "1.0.50",
+  "version": "1.0.55",
   "author": "tomkp <tom@tomkp.com>",
   "keywords": [
     "pcsc",
@@ -26,5 +26,7 @@
     "@msi.js/pcsclite": "^1.0.0-dev.2",
     "@types/node": "14.0.6"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "typescript": "^3.9.5"
+  }
 }
