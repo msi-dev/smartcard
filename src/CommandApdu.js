@@ -7,6 +7,7 @@ CASE    COMMAND     RESPONSE
 4       DATA        DATA
 */
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.CommandApdu = void 0;
 class CommandApdu {
     constructor(obj) {
         if (obj.bytes) {
@@ -80,7 +81,7 @@ class CommandApdu {
         }
     }
     toString() {
-        return Buffer.isBuffer(this.bytes) ? this.bytes.toString('hex') : this.bytes;
+        return Buffer.isBuffer(this.bytes) ? this.bytes.toString('hex') : this.toHexString(this.bytes);
     }
     toByteArray() {
         return this.bytes;
@@ -91,6 +92,14 @@ class CommandApdu {
     setLe(le) {
         this.bytes.pop();
         this.bytes.push(le);
+    }
+    toHexString(byteArray) {
+        let str = '';
+        byteArray.forEach(b => {
+            const hex = b.toString(16);
+            str += hex.length < 2 ? '0' + hex : hex;
+        });
+        return str;
     }
 }
 exports.CommandApdu = CommandApdu;

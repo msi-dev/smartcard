@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.ResponseApdu = void 0;
 const statusCodes = {
     '^9000$': 'Normal processing',
     '^61(.{2})$': 'Normal processing, (sw2 indicates the number of response bytes still available)',

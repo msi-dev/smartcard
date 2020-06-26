@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Device = void 0;
 const Card_1 = require("./Card");
 const events_1 = require("events");
 class Device extends events_1.EventEmitter {
@@ -22,9 +23,12 @@ class Device extends events_1.EventEmitter {
                 }
                 else {
                     this.card = new Card_1.default(this, status.atr, protocol);
+                    let start = Date.now();
                     setTimeout(() => {
+                        const milli = Date.now() - start;
+                        console.log('[on smartcard lib] card-inserted delay:', milli);
                         this.emit('card-inserted', { device: this, card: this.card });
-                    }, 300);
+                    }, 1000);
                 }
             });
         };
