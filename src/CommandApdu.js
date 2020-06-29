@@ -7,7 +7,6 @@ CASE    COMMAND     RESPONSE
 4       DATA        DATA
 */
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.CommandApdu = void 0;
 class CommandApdu {
     constructor(obj) {
         if (obj.bytes) {

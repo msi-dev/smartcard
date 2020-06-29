@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Iso7816Application = void 0;
 const events_1 = require("events");
 const CommandApdu_1 = require("./CommandApdu");
 const ResponseApdu_1 = require("./ResponseApdu");

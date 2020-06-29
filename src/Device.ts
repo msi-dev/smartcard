@@ -4,8 +4,8 @@ import {EventEmitter} from 'events';
 
 export class Device extends EventEmitter {
     public reader: any;
-    public name: any;
-    public card: any;
+    public name: string;
+    public card: Card;
 
     constructor(reader) {
         super();
@@ -22,45 +22,59 @@ export class Device extends EventEmitter {
             return (changes & reader.SCARD_STATE_EMPTY) && (status.state & reader.SCARD_STATE_EMPTY);
         };
 
-        const cardInserted = (reader, status) => {
-            reader.connect({share_mode: 2},(err, protocol) => {
-                if (err) {
-                    this.emit('error', err);
-                } else {
-                    this.card = new Card(this, status.atr, protocol);
-                    let start = Date.now();
-                    setTimeout(() => {
-                        const milli = Date.now() - start;
-                        console.log('[on smartcard lib] card-inserted delay:', milli);
-                        this.emit('card-inserted', {device: this, card: this.card});
-                    }, 1000);
-                }
-            });
-        };
-
-        const cardRemoved = (reader) => {
-            const name = reader.name;
-            reader.disconnect(reader.SCARD_LEAVE_CARD, (err) => {
-                if (err) {
-                    this.emit('error', err);
-                } else {
-                    this.emit('card-removed', {name, card: this.card});
-                    this.card = null;
-                }
-            });
-        };
-
-        reader.on('status', (status) => {
+        reader.on('status', async (status) => {
             var changes = reader.state ^ status.state;
             if (changes) {
                 if (isCardRemoved(changes, reader, status)) {
-                    cardRemoved(reader);
+                    this.cardRemoved(reader);
                 } else if (isCardInserted(changes, reader, status)) {
-                    cardInserted(reader, status);
+                    this.cardInserted(reader, status);
+                } else {
+                    if(reader.state & reader.SCARD_STATE_PRESENT) {
+                        this.cardRemoved(this.reader);
+                        if(!this.card)
+                            this.cardInserted(reader, status);
+                    }
                 }
             }
         });
     }
+
+    cardInserted (reader, status) {
+        return new Promise((resolve, reject) => {
+            reader.connect({share_mode: 2},(err, protocol) => {
+                if (err) {
+                    this.emit('error', err);
+                    reject(err);
+                } else {
+                    this.card = new Card(this, status.atr, protocol);
+                    setTimeout(() => {
+                        this.emit('card-inserted', {device: this, card: this.card});
+                        resolve();
+                    }, 1000);
+                }
+            });
+        });
+    };
+
+    cardRemoved (reader) {
+        const name = reader.name;
+        return new Promise((resolve, reject) => {
+            reader.disconnect(reader.SCARD_LEAVE_CARD, (err) => {
+                if (err) {
+                    this.emit('error', err);
+                    reject(err);
+                } else {
+                    this.emit('card-removed', {name, card: this.card});
+                    this.card = null;
+                    resolve();
+                }
+            });
+
+        })
+        
+    };
+
 
     transmit(data, res_len, protocol, cb) {
         this.reader.transmit(data, res_len, protocol, cb);

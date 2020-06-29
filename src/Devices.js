@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Devices = void 0;
 const pcsclite = require('@msi.js/pcsclite');
 const events_1 = require("events");
 const Device_1 = require("./Device");
