@@ -1,6 +1,6 @@
 {
   "name": "@msi.js/smartcard",
-  "version": "1.0.74",
+  "version": "1.0.75",
   "author": "tomkp <tom@tomkp.com>",
   "keywords": [
     "pcsc",
