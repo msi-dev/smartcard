@@ -4,5 +4,7 @@
 .idea
 /lib
 **/*.js
+*.js
 **/*.js.map
+*.js.map
 *.d.ts

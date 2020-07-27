@@ -51,7 +51,7 @@ export class Device extends EventEmitter {
                     setTimeout(() => {
                         this.emit('card-inserted', {device: this, card: this.card});
                         resolve();
-                    }, 1000);
+                    }, 2000);
                 }
             });
         });
