@@ -1,5 +1,5 @@
 import Card from './Card';
-import {EventEmitter} from 'events';
+import { EventEmitter } from 'events';
 
 
 export class Device extends EventEmitter {
@@ -29,35 +29,34 @@ export class Device extends EventEmitter {
                     this.cardRemoved(reader);
                 } else if (isCardInserted(changes, reader, status)) {
                     this.cardInserted(reader, status);
-                } else {
-                    if(reader.state & reader.SCARD_STATE_PRESENT) {
-                        this.cardRemoved(this.reader);
-                        if(!this.card)
-                            this.cardInserted(reader, status);
+                } else if (!(changes & reader.SCARD_STATE_PRESENT) && (status.state & reader.SCARD_STATE_PRESENT)) {
+                    if (this.card && status.atr && this.card.atr !== status.atr.toString('hex')) {
+                        console.log(`Device -> constructor -> status.state`, status.state)
+                        console.log(`Device -> constructor -> changes`, changes)
+                        await this.cardRemoved(this.reader);
+                        await this.cardInserted(reader, status);
                     }
                 }
             }
         });
     }
 
-    cardInserted (reader, status) {
+    cardInserted(reader, status) {
         return new Promise((resolve, reject) => {
-            reader.connect({share_mode: 2},(err, protocol) => {
+            reader.connect({ share_mode: 2 }, (err, protocol) => {
                 if (err) {
                     this.emit('error', err);
                     reject(err);
                 } else {
                     this.card = new Card(this, status.atr, protocol);
-                    setTimeout(() => {
-                        this.emit('card-inserted', {device: this, card: this.card});
-                        resolve();
-                    }, 1000);
+                    this.emit('card-inserted', { device: this, card: this.card });
+                    resolve();
                 }
             });
         });
     };
 
-    cardRemoved (reader) {
+    cardRemoved(reader) {
         const name = reader.name;
         return new Promise((resolve, reject) => {
             reader.disconnect(reader.SCARD_LEAVE_CARD, (err) => {
@@ -65,14 +64,12 @@ export class Device extends EventEmitter {
                     this.emit('error', err);
                     reject(err);
                 } else {
-                    this.emit('card-removed', {name, card: this.card});
+                    this.emit('card-removed', { name, card: this.card });
                     this.card = null;
                     resolve();
                 }
             });
-
         })
-        
     };
 
 

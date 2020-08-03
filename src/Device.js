@@ -24,11 +24,12 @@ class Device extends events_1.EventEmitter {
                 else if (isCardInserted(changes, reader, status)) {
                     this.cardInserted(reader, status);
                 }
-                else {
-                    if (reader.state & reader.SCARD_STATE_PRESENT) {
-                        this.cardRemoved(this.reader);
-                        if (!this.card)
-                            this.cardInserted(reader, status);
+                else if (!(changes & reader.SCARD_STATE_PRESENT) && (status.state & reader.SCARD_STATE_PRESENT)) {
+                    if (this.card && status.atr && this.card.atr !== status.atr.toString('hex')) {
+                        console.log(`Device -> constructor -> status.state`, status.state);
+                        console.log(`Device -> constructor -> changes`, changes);
+                        await this.cardRemoved(this.reader);
+                        await this.cardInserted(reader, status);
                     }
                 }
             }
@@ -43,10 +44,8 @@ class Device extends events_1.EventEmitter {
                 }
                 else {
                     this.card = new Card_1.default(this, status.atr, protocol);
-                    setTimeout(() => {
-                        this.emit('card-inserted', { device: this, card: this.card });
-                        resolve();
-                    }, 1000);
+                    this.emit('card-inserted', { device: this, card: this.card });
+                    resolve();
                 }
             });
         });
