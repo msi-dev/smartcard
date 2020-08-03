@@ -3,6 +3,6 @@
 *.log
 .idea
 /lib
-**/*.js
-**/*.js.map
+*.js
+*.js.map
 *.d.ts

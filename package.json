@@ -1,6 +1,6 @@
 {
   "name": "@msi.js/smartcard",
-  "version": "1.0.77",
+  "version": "1.0.77-debug.1",
   "author": "tomkp <tom@tomkp.com>",
   "keywords": [
     "pcsc",
@@ -21,12 +21,14 @@
   },
   "homepage": "https://github.com/tomkp/smartcard",
   "main": "src/index.js",
-  "scripts": {},
+  "scripts": {
+    "clean": "find src -name '*.js' -delete && find src -name '*.js.map' -delete && find src -name '*.d.ts' -delete && tsc"
+  },
   "dependencies": {
     "@msi.js/pcsclite": "^1.0.0-dev.2",
     "@types/node": "14.0.6"
   },
   "devDependencies": {
-    "typescript": "^3.9.5"
+    "typescript": "3.9.7"
   }
 }

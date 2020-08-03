@@ -6,6 +6,8 @@ export class Device extends EventEmitter {
     public reader: any;
     public name: string;
     public card: Card;
+    private readonly SCARD_STATE_UNPOWERED : number  = 0x0400;
+    private readonly SCARD_STATE_POWERED : number  = 0x0100;
 
     constructor(reader) {
         super();
@@ -22,20 +24,25 @@ export class Device extends EventEmitter {
             return (changes & reader.SCARD_STATE_EMPTY) && (status.state & reader.SCARD_STATE_EMPTY);
         };
 
+        const isCardReseted = (changes, reader, status) => {
+            return (reader.state & this.SCARD_STATE_UNPOWERED) && (changes & this.SCARD_STATE_POWERED) && (status.state & this.SCARD_STATE_POWERED);
+        };
+
+
         reader.on('status', async (status) => {
+        console.log(`Device -> constructor -> status`, status)
             var changes = reader.state ^ status.state;
             if (changes) {
                 if (isCardRemoved(changes, reader, status)) {
                     this.cardRemoved(reader);
                 } else if (isCardInserted(changes, reader, status)) {
+                    setTimeout(() => {
+                        this.cardInserted(reader, status);
+                    }, 1000);
+                } else if(isCardReseted(changes, reader, status)) {
+                    await this.cardRemoved(reader)
                     this.cardInserted(reader, status);
-                } else if (!(changes & reader.SCARD_STATE_PRESENT) && (status.state & reader.SCARD_STATE_PRESENT)) {
-                    if (this.card && status.atr && this.card.atr !== status.atr.toString('hex')) {
-                        console.log(`Device -> constructor -> status.state`, status.state)
-                        console.log(`Device -> constructor -> changes`, changes)
-                        await this.cardRemoved(this.reader);
-                        await this.cardInserted(reader, status);
-                    }
+
                 }
             }
         });
