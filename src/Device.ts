@@ -17,7 +17,7 @@ export class Device extends EventEmitter {
         this.card = null;
 
         const isCardInserted = (changes, reader, status) => {
-            return (changes & reader.SCARD_STATE_PRESENT) && (status.state & reader.SCARD_STATE_PRESENT);
+            return (changes & reader.SCARD_STATE_PRESENT) &&  !(status.state & this.SCARD_STATE_UNPOWERED) && (status.state & reader.SCARD_STATE_PRESENT);
         };
 
         const isCardRemoved = (changes, reader, status) => {
@@ -25,21 +25,29 @@ export class Device extends EventEmitter {
         };
 
         const isCardReseted = (changes, reader, status) => {
-            return (reader.state & this.SCARD_STATE_UNPOWERED) && (changes & this.SCARD_STATE_POWERED) && (status.state & this.SCARD_STATE_POWERED);
+            return ((reader.state & this.SCARD_STATE_UNPOWERED) && (changes & this.SCARD_STATE_POWERED) && (status.state & this.SCARD_STATE_POWERED));
+            // || ((!changes) && (status.state & this.SCARD_STATE_POWERED) && (status.state & reader.SCARD_STATE_PRESENT));;
         };
 
 
         reader.on('status', async (status) => {
-        console.log(`Device -> constructor -> status`, status)
             var changes = reader.state ^ status.state;
+            console.log('----------------------------------')
+            console.log(`changes`, changes.toString(16))
+            console.log(`reader.state`, reader.state?.toString(16))
+            console.log(`card.state`, status.state?.toString(16))
+            console.log('card atr', status.atr.toString('hex'))
             if (changes) {
                 if (isCardRemoved(changes, reader, status)) {
+                    console.log('Removing card!')
                     this.cardRemoved(reader);
                 } else if (isCardInserted(changes, reader, status)) {
+                    console.log('Inserting card!')
                     setTimeout(() => {
                         this.cardInserted(reader, status);
                     }, 1000);
                 } else if(isCardReseted(changes, reader, status)) {
+                    console.log('Reseting card!')
                     await this.cardRemoved(reader)
                     this.cardInserted(reader, status);
 
@@ -51,6 +59,8 @@ export class Device extends EventEmitter {
     cardInserted(reader, status) {
         return new Promise((resolve, reject) => {
             reader.connect({ share_mode: 2 }, (err, protocol) => {
+                if(!protocol) //not the right fix, buy may be a safeguard for it
+                    reject();
                 if (err) {
                     this.emit('error', err);
                     reject(err);
@@ -93,6 +103,7 @@ export class Device extends EventEmitter {
     }
 
     reset(action, cb) {
+        this.reader.state = (this.reader.state & ~this.SCARD_STATE_POWERED) | this.SCARD_STATE_UNPOWERED;
         return this.reader.reconnect({ initialization: action }, cb);
     }
 }
